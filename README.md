@@ -7,3 +7,5 @@ SB Creative社「やさしいPython」を写経したり、適当に弄ってみ
 - Sample10 ：デコレーター
 - Sample6 ：クラス
 - myclass ：クラス
+- Sample4 ：json read/write
+- Dummy.json ：test data
