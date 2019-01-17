@@ -88,13 +88,20 @@ def main(argv):
         # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
         # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
         ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
-        ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
+        ffile = r"D:\kitaz\Python_Training\QT_02\sample2.conf"
         ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
         write_data(ifile, ffile, ofile)
 #        cleansing_data(ifile, ffile, ofile)
 
     except (ArgsError, MemoryError, OSError) as exc:
         print(exc, file=sys.stderr)
+
+    except ValueError as exc:
+        print(exc)
+
+    except SyntaxError as exc:
+        print("例外が発生しました。行数()　項目番号()")
+        print(exc)
 
         # basic_11 を参考に例外処理
 
