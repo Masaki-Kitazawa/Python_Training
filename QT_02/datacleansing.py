@@ -13,6 +13,14 @@ class ArgsError(Exception):
             f'usage: {os.path.basename(modname)} -i INFILE -f CONFFILE -o OUTFILE\n'
             f'error: Invalid Parameter: {err}')
 
+class HOGError(Exception):
+    """"""
+    def __init__(self, modname, err):
+        """__init__"""
+        super().__init__(
+            f'usage: {os.path.basename(modname)} -i INFILE -f CONFFILE -o OUTFILE\n'
+            f'error: Invalid Parameter: {err}')
+
 def parse_args(argv):
     """parse arguments（パクリ）"""
     args = {}
@@ -55,15 +63,27 @@ def cleansing_data(infname, conffname):
     conflist = read_conf(conffname)
 
     # 入力データを1行ずつ読みながら、クレンジング
+    lineno = 0
     for data in read_data(infname):
+        lineno += 1
         for col,funcname, parm in conflist:
             colno = int(col)
             print("BASE : ",colno,funcname, "parm = ", parm, "data = ", data[colno-1])
 
             # カッコ悪いけど毎回ロードする(クレンジング設定のように事前に持っておきたいけど)
             m = importlib.import_module("func."+funcname)
-            ret = m.init_func(parm)
-            data[colno-1] = m.main_func(ret, data[colno-1])
+
+            try:
+                ret = m.init_func(parm)
+                data[colno-1] = m.main_func(ret, data[colno-1])
+            except (ValueError, SyntaxError) as exc:
+                print("例外が発生しました。行数(", lineno, ")　項目番号(", colno, ")")
+                print("理由:", exc)
+                print("データ:", data[colno-1])
+                sys.exit()
+            else:
+                pass
+
             print("BASE : data = ", data[colno-1])
         yield data
 
@@ -96,17 +116,12 @@ def main(argv):
     except (ArgsError, MemoryError, OSError) as exc:
         print(exc, file=sys.stderr)
 
-    except ValueError as exc:
-        print(exc)
-
-    except SyntaxError as exc:
-        print("例外が発生しました。行数()　項目番号()")
-        print(exc)
-
-        # basic_11 を参考に例外処理
+    #     # basic_11 を参考に例外処理
 
     else:
         result = 0
+    finally:
+        print("in finaly")
     return result
 
 if __name__ == '__main__':

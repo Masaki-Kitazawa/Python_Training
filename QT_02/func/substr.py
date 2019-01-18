@@ -10,7 +10,7 @@ def init_func(param):
 
     plist = pattern.findall(param)
     if len(plist) < 1 or len(plist[0]) < 1:
-        raise SyntaxError("理由:引数が足りません\nデータ:")
+        raise SyntaxError("引数が足りません")
     else:
         startpos = plist[0][0]
         lennum = plist[0][1]
