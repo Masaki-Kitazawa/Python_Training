@@ -13,14 +13,6 @@ class ArgsError(Exception):
             f'usage: {os.path.basename(modname)} -i INFILE -f CONFFILE -o OUTFILE\n'
             f'error: Invalid Parameter: {err}')
 
-class HOGError(Exception):
-    """"""
-    def __init__(self, modname, err):
-        """__init__"""
-        super().__init__(
-            f'usage: {os.path.basename(modname)} -i INFILE -f CONFFILE -o OUTFILE\n'
-            f'error: Invalid Parameter: {err}')
-
 def parse_args(argv):
     """parse arguments（パクリ）"""
     args = {}
@@ -107,8 +99,8 @@ def main(argv):
         # ifile = r"C:\kitazawa\dev\python_training\QT_02\sample.in"
         # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
         # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
-        ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
-        ffile = r"D:\kitaz\Python_Training\QT_02\sample2.conf"
+        ifile = r"D:\kitaz\Python_Training\QT_02\sample1.in"
+        ffile = r"D:\kitaz\Python_Training\QT_02\sample1.conf"
         ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
         write_data(ifile, ffile, ofile)
 #        cleansing_data(ifile, ffile, ofile)

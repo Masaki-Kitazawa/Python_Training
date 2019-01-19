@@ -22,6 +22,11 @@ def main_func(num, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
 
     # dataの長さと、切り出す開始位置、長さが許容範囲か確認
+    datalen = len(data)
+    if num[0] < 0 or num[0] > datalen:
+        raise ValueError("データ長または切り出し開始位置が不正です")
+    if (num[0]+num[1]-1) > datalen:
+        raise ValueError("データ長または切り出し長さが不正です")
 
     print(__name__, "(B) ：", data)
     data = data[(num[0]-1):(num[0]+num[1]-1)]

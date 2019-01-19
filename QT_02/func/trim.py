@@ -3,7 +3,7 @@
 def init_func(param):
     """ paramは各関数に渡す引数。ここで初期処理を行う """
     if (param != ""):
-        print(__name__, "パラメータは不要なのだが")
+        raise SyntaxError("不要な引数があります")
     func_data = ""
     return func_data
 
