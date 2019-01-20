@@ -1,12 +1,13 @@
-"""サンプル"""
+"""日時データを指定の書式に変換する"""
 import re
 import datetime
 
-
 def check_date(inyear, inmonth, inday):
+    """西暦年、月、日の組み合わせの正当性をチェックする"""
     try:
-        newDataStr = "%04d/%02d/%02d"%(inyear, inmonth, inday)
-        newDate = datetime.datetime.strptime(newDataStr, "%Y/%m/%d")
+        checkdatestr = "%04d/%02d/%02d"%(inyear, inmonth, inday)
+#        resultdatestr = datetime.datetime.strptime(checkdatestr, "%Y/%m/%d")
+        datetime.datetime.strptime(checkdatestr, "%Y/%m/%d")
         return True
     except ValueError:
         return False
@@ -17,16 +18,16 @@ def convert_wareki(inyear, inmonth, inday):
     tmp = (inyear * 10000) + (inmonth * 100) + inday
     if tmp >= 19890108:
         wareki = "平成"
-        wyear = inyear - 1989 -1
+        wyear = inyear - 1989 +1
     elif tmp >= 19261225:
         wareki = "昭和"
-        wyear = inyear - 1926 -1
+        wyear = inyear - 1926 +1
     elif tmp >= 19120730:
         wareki = "大正"
-        wyear = inyear - 1912 -1
+        wyear = inyear - 1912 +1
     elif tmp >= 18680908:
         wareki = "明治"
-        wyear = inyear - 1868 -1
+        wyear = inyear - 1868 +1
     else:
         raise ValueError("システム対象外の日付が入力されています")
 
@@ -36,22 +37,22 @@ def convert_wareki(inyear, inmonth, inday):
 def convert_seireki(wareki, wayear):
     """引数の元号と和暦年から西暦年を返す"""
     if wareki == "平成":
-        year = wayear + 1989 + 1
+        year = wayear + 1989 - 1
     elif wareki == "昭和":
-        year = wayear + 1926 + 1
+        year = wayear + 1926 - 1
     elif wareki == "大正":
-        year = wayear + 1912 + 1
+        year = wayear + 1912 - 1
     elif wareki == "明治":
-        year = wayear + 1868 + 1
+        year = wayear + 1868 - 1
     else:
         raise ValueError("不正な元号が入力されています")
 
-    return year    
+    return year
 
 
 def init_func(param):
     """ paramは各関数に渡す引数。ここで初期処理を行う """
-    if (param == ""):
+    if param == "":
         raise SyntaxError("引数がありません")
 
     return param
@@ -59,7 +60,8 @@ def init_func(param):
 
 def main_func(func_data, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
-    print(__name__, "(B) ：", data)
+
+#    print(__name__, "(B) ：", data)
 
     ptnymds = re.compile(r'([0-9]+)[/-]([0-9]+)[/-]([0-9]+)')
     ptnymdw = re.compile(r'(明治|大正|昭和|平成)([0-9]+)年([0-9]+)月([0-9]+)日')
@@ -99,7 +101,7 @@ def main_func(func_data, data):
             raise ValueError("システムの対象範囲外の年が入力されています")
 
         # 西暦年月日が有効か確認
-        if check_date(inyear, inmonth, inday) == False:
+        if not check_date(inyear, inmonth, inday):
             raise ValueError("無効な日付が入力されています")
 
     #　時刻の取得
@@ -109,31 +111,32 @@ def main_func(func_data, data):
         insecond = int(hms[0][2])
 
         # 時刻が有効か確認
-        if inhour < 0 or inhour >= 24 or inminute < 0 or inminute >= 60 or insecond < 0 or insecond >= 60:
-            raise ValueError("無効な時刻が入力されています")
+        if inhour < 0 or inhour >= 24:
+            raise ValueError("無効な時刻(時)が入力されています")
+        if inminute < 0 or inminute >= 60:
+            raise ValueError("無効な時刻(分)が入力されています")
+        if insecond < 0 or insecond >= 60:
+            raise ValueError("無効な時刻(秒)が入力されています")
 
     # func_dataで指定された書式に変換
     outdata = func_data
     outdata = re.sub('YYYY', str(inyear), outdata)
     outdata = re.sub('EE', str(inwareki), outdata)
     outdata = re.sub('YY', str(inwayear), outdata)
-    outdata = re.sub('MM', str(inmonth), outdata)
+    outdata = re.sub('MM', str(inmonth).zfill(2), outdata)
     outdata = re.sub('mm', str(inmonth), outdata)
-    outdata = re.sub('DD', str(inday), outdata)
+    outdata = re.sub('DD', str(inday).zfill(2), outdata)
     outdata = re.sub('dd', str(inday), outdata)
-    outdata = re.sub('HH', str(inhour), outdata)
-    outdata = re.sub('MI', str(inminute), outdata)
-    outdata = re.sub('SS', str(insecond), outdata)
+    outdata = re.sub('HH', str(inhour).zfill(2), outdata)
+    outdata = re.sub('MI', str(inminute).zfill(2), outdata)
+    outdata = re.sub('SS', str(insecond).zfill(2), outdata)
 
-    # 残　前ゼロ付ける処理
-    # Noneの対応
+#    print(__name__, "(A) ：", outdata)
 
-    print(__name__, "(A) ：", outdata)
-    # このデータが変換後のデータとして出力される(もしくは次の変換の入力データになる)
     return outdata
 
 def main():
-    pass
+    """main"""
 
 if __name__ == '__main__':
     main()

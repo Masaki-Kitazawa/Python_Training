@@ -9,13 +9,16 @@ def init_func(param):
     #     print(stpos, lennum)
 
     plist = pattern.findall(param)
-    if len(plist) < 1 or len(plist[0]) < 1:
-        raise SyntaxError("引数が足りません")
-    else:
-        startpos = plist[0][0]
-        lennum = plist[0][1]
 
-    func_data = (int(startpos),int(lennum))
+    paramnum = len(plist)
+    if paramnum != 1:
+        raise SyntaxError("引数に過不足があります")
+
+    paramnum = len(plist[0])
+    if paramnum != 2:
+        raise SyntaxError("引数に過不足があります")
+
+    func_data = (int(plist[0][0]), int(plist[0][1]))
     return func_data
 
 def main_func(num, data):
@@ -28,14 +31,14 @@ def main_func(num, data):
     if (num[0]+num[1]-1) > datalen:
         raise ValueError("データ長または切り出し長さが不正です")
 
-    print(__name__, "(B) ：", data)
+#    print(__name__, "(B) ：", data)
     data = data[(num[0]-1):(num[0]+num[1]-1)]
-    print(__name__, "(A) ：", data)
+#    print(__name__, "(A) ：", data)
 
     return data
 
 def main():
-    pass
+    """main"""
 
 if __name__ == '__main__':
     main()

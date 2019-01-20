@@ -1,4 +1,4 @@
-"""サンプル"""
+"""入力データに対し正規表現による置換を行う"""
 import re
 
 def init_func(param):
@@ -29,15 +29,15 @@ def init_func(param):
 def main_func(func_data, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
 
-    print(__name__, "(B) ：", data)
+#    print(__name__, "(B) ：", data)
     data = re.sub(func_data[0], func_data[1], data)
-    print(__name__, "(A) ：", data)
+#    print(__name__, "(A) ：", data)
 
     # このデータが変換後のデータとして出力される(もしくは次の変換の入力データになる)
     return data
 
 def main():
-    pass
+    """main"""
 
 if __name__ == '__main__':
     main()

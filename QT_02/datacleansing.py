@@ -1,7 +1,6 @@
 """sample"""
 import csv
 import os
-import re
 import sys
 import importlib
 
@@ -37,16 +36,16 @@ def parse_args(argv):
 def read_conf(conffname):
     """クレンジング設定ファイルを読む"""
     with open(conffname, 'rt', encoding='utf-8') as inf:
-        rd = csv.reader(inf)
-        data = sorted(rd, key=lambda x: (x[0])) # 項目番号でソート(不要？)
-    return(data)
+        csvrd = csv.reader(inf)
+        data = sorted(csvrd, key=lambda x: (x[0])) # 項目番号でソート(不要？)
+    return data
 
 def read_data(infname):
     """入力データ(csv)を読む"""
     with open(infname, 'rt', encoding='utf-8') as inf:
-        rd = csv.reader(inf)
+        csvrd = csv.reader(inf)
         # 入力ファイルを1行ずつ読んでリストを返す
-        for line in rd:
+        for line in csvrd:
             yield line
 
 def cleansing_data(infname, conffname):
@@ -58,16 +57,16 @@ def cleansing_data(infname, conffname):
     lineno = 0
     for data in read_data(infname):
         lineno += 1
-        for col,funcname, parm in conflist:
+        for col, funcname, parm in conflist:
             colno = int(col)
-            print("BASE : ",colno,funcname, "parm = ", parm, "data = ", data[colno-1])
+#            print("BASE : ",colno,funcname, "parm = ", parm, "data = ", data[colno-1])
 
             # カッコ悪いけど毎回ロードする(クレンジング設定のように事前に持っておきたいけど)
-            m = importlib.import_module("func."+funcname)
+            plugmod = importlib.import_module("func."+funcname)
 
             try:
-                ret = m.init_func(parm)
-                data[colno-1] = m.main_func(ret, data[colno-1])
+                ret = plugmod.init_func(parm)
+                data[colno-1] = plugmod.main_func(ret, data[colno-1])
             except (ValueError, SyntaxError) as exc:
                 print("例外が発生しました。行数(", lineno, ")　項目番号(", colno, ")")
                 print("理由:", exc)
@@ -76,7 +75,7 @@ def cleansing_data(infname, conffname):
             else:
                 pass
 
-            print("BASE : data = ", data[colno-1])
+#            print("BASE : data = ", data[colno-1])
         yield data
 
 def write_data(infname, conffname, outfname):
@@ -99,21 +98,19 @@ def main(argv):
         # ifile = r"C:\kitazawa\dev\python_training\QT_02\sample.in"
         # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
         # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
-        ifile = r"D:\kitaz\Python_Training\QT_02\sample1.in"
-        ffile = r"D:\kitaz\Python_Training\QT_02\sample1.conf"
+        ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
+        ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
         ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
         write_data(ifile, ffile, ofile)
-#        cleansing_data(ifile, ffile, ofile)
 
     except (ArgsError, MemoryError, OSError) as exc:
         print(exc, file=sys.stderr)
 
-    #     # basic_11 を参考に例外処理
-
     else:
         result = 0
     finally:
-        print("in finaly")
+        pass
+
     return result
 
 if __name__ == '__main__':
