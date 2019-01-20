@@ -89,19 +89,19 @@ def main(argv):
     result = 1
 
     try:
-        # # 引数チェック
-        # args = parse_args(argv)
-        # # 入力データに基づき変換処理を呼び出す
-        # write_data(args['-i'], args['-f'], args['-o'])
+        # 引数チェック
+        args = parse_args(argv)
+        # 入力データに基づき変換処理を呼び出す
+        write_data(args['-i'], args['-f'], args['-o'])
 
         #テスト用
         # ifile = r"C:\kitazawa\dev\python_training\QT_02\sample.in"
         # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
         # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
-        ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
-        ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
-        ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
-        write_data(ifile, ffile, ofile)
+        # ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
+        # ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
+        # ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
+        # write_data(ifile, ffile, ofile)
 
     except (ArgsError, MemoryError, OSError) as exc:
         print(exc, file=sys.stderr)

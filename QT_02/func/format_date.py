@@ -62,74 +62,74 @@ def main_func(func_data, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
 
 #    print(__name__, "(B) ：", data)
+    valymd = [0, 0, 0]
+    valhms = [0, 0, 0]
+    wayear = 0
+    wareki = ""
 
     ptnymds = re.compile(r'([0-9]+)[/-]([0-9]+)[/-]([0-9]+)')
     ptnymdw = re.compile(r'(明治|大正|昭和|平成)([0-9]+)年([0-9]+)月([0-9]+)日')
     ptnhms = re.compile(r'([0-9]+):([0-9]+):([0-9]+)')
-
-    inyear, inwayear, inmonth, inday, inhour, inminute, insecond = 0, 0, 0, 0, 0, 0, 0
-    inwareki = ""
-
     ymds = ptnymds.findall(data)
     ymdw = ptnymdw.findall(data)
     hms = ptnhms.findall(data)
 
     # 年月日の取得
     if ymds != []:
-        inyear = int(ymds[0][0])
-        inmonth = int(ymds[0][1])
-        inday = int(ymds[0][2])
+        valymd[0] = int(ymds[0][0])
+        valymd[1] = int(ymds[0][1])
+        valymd[2] = int(ymds[0][2])
 
         # 和暦を取得
-        tmp = convert_wareki(inyear, inmonth, inday)
-        inwareki = tmp[0]
-        inwayear = tmp[1]
+        tmp = convert_wareki(valymd[0], valymd[1], valymd[2])
+        wareki = tmp[0]
+        wayear = tmp[1]
 
     if ymdw != []:
-        inwareki = ymdw[0][0]
-        inwayear = int(ymdw[0][1])
-        inmonth = int(ymdw[0][2])
-        inday = int(ymdw[0][3])
+        wareki = ymdw[0][0]
+        wayear = int(ymdw[0][1])
+        valymd[1] = int(ymdw[0][2])
+        valymd[2] = int(ymdw[0][3])
 
         # 西暦を取得
-        inyear = convert_seireki(inwareki, inwayear)
+        valymd[0] = convert_seireki(wareki, wayear)
 
     # 年月日の入力がある場合
     if ymds != [] or ymdw != []:
         # 西暦1900年未満は対象外
-        if inyear < 1900:
+        if valymd[0] < 1900:
             raise ValueError("システムの対象範囲外の年が入力されています")
 
         # 西暦年月日が有効か確認
-        if not check_date(inyear, inmonth, inday):
+        if not check_date(valymd[0], valymd[1], valymd[2]):
             raise ValueError("無効な日付が入力されています")
 
     #　時刻の取得
     if hms != []:
-        inhour = int(hms[0][0])
-        inminute = int(hms[0][1])
-        insecond = int(hms[0][2])
+        valhms[0] = int(hms[0][0])
+        valhms[1] = int(hms[0][1])
+        valhms[2] = int(hms[0][2])
 
         # 時刻が有効か確認
-        if inhour < 0 or inhour >= 24:
+        if valhms[0] < 0 or valhms[0] >= 24:
             raise ValueError("無効な時刻(時)が入力されています")
-        if inminute < 0 or inminute >= 60:
+        if valhms[1] < 0 or valhms[1] >= 60:
             raise ValueError("無効な時刻(分)が入力されています")
-        if insecond < 0 or insecond >= 60:
+        if valhms[2] < 0 or valhms[2] >= 60:
             raise ValueError("無効な時刻(秒)が入力されています")
 
     # func_dataで指定された書式に変換
     outdata = func_data
-    outdata = re.sub('YYYY', str(inyear), outdata)
-    outdata = re.sub('EE', str(inwareki), outdata)
-    outdata = re.sub('YY', str(inwayear), outdata)
-    outdata = re.sub('MM', str(inmonth).zfill(2), outdata)
-    outdata = re.sub('mm', str(inmonth), outdata)
-    outdata = re.sub('DD', str(inday).zfill(2), outdata)
-    outdata = re.sub('dd', str(inday), outdata)
-    outdata = re.sub('HH', str(inhour).zfill(2), outdata)
-    outdata = re.sub('MI', str(inminute).zfill(2), outdata)
-    outdata = re.sub('SS', str(insecond).zfill(2), outdata)
+    outdata = re.sub('YYYY', str(valymd[0]), outdata)
+    outdata = re.sub('EE', str(wareki), outdata)
+    outdata = re.sub('YY', str(wayear), outdata)
+    outdata = re.sub('MM', str(valymd[1]).zfill(2), outdata)
+    outdata = re.sub('mm', str(valymd[1]), outdata)
+    outdata = re.sub('DD', str(valymd[2]).zfill(2), outdata)
+    outdata = re.sub('dd', str(valymd[2]), outdata)
+    outdata = re.sub('HH', str(valhms[0]).zfill(2), outdata)
+    outdata = re.sub('MI', str(valhms[1]).zfill(2), outdata)
+    outdata = re.sub('SS', str(valhms[2]).zfill(2), outdata)
 
 #    print(__name__, "(A) ：", outdata)
 
