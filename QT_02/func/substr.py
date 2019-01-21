@@ -4,10 +4,10 @@ import re
 def init_func(param):
     """ paramは各関数に渡す引数。ここで初期処理を行う """
 
-    pattern = re.compile(r'([0-9]+),([0-9]+)')
-    # for stpos, lennum in pattern.findall(param):
-    #     print(stpos, lennum)
+    if param is None:
+        raise SyntaxError("引数がありません")
 
+    pattern = re.compile(r'([0-9]+),([0-9]+)')
     plist = pattern.findall(param)
 
     paramnum = len(plist)
@@ -31,9 +31,7 @@ def main_func(num, data):
     if (num[0]+num[1]-1) > datalen:
         raise ValueError("データ長または切り出し長さが不正です")
 
-#    print(__name__, "(B) ：", data)
     data = data[(num[0]-1):(num[0]+num[1]-1)]
-#    print(__name__, "(A) ：", data)
 
     return data
 

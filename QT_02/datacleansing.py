@@ -37,7 +37,26 @@ def read_conf(conffname):
     """クレンジング設定ファイルを読む"""
     with open(conffname, 'rt', encoding='utf-8') as inf:
         csvrd = csv.reader(inf)
-        data = sorted(csvrd, key=lambda x: (x[0])) # 項目番号でソート(不要？)
+        data = []
+
+        for row in csvrd:
+            rownum = len(row)
+
+            if rownum == 2:
+                col = row[0]
+                funcname = row[1]
+                data.append([col, funcname, None])
+            elif rownum == 3:
+                col = row[0]
+                funcname = row[1]
+                if row[2] == '':
+                    param = None
+                else:
+                    param = row[2]
+                data.append([col, funcname, param])
+            else:
+                raise SyntaxError("クレンジング設定ファイルの記載が不正です")
+
     return data
 
 def read_data(infname):
@@ -61,7 +80,7 @@ def cleansing_data(infname, conffname):
             colno = int(col)
 #            print("BASE : ",colno,funcname, "parm = ", parm, "data = ", data[colno-1])
 
-            # カッコ悪いけど毎回ロードする(クレンジング設定のように事前に持っておきたいけど)
+            # 恰好悪いけど毎回ロードする
             plugmod = importlib.import_module("func."+funcname)
 
             try:
@@ -89,19 +108,19 @@ def main(argv):
     result = 1
 
     try:
-        # 引数チェック
-        args = parse_args(argv)
-        # 入力データに基づき変換処理を呼び出す
-        write_data(args['-i'], args['-f'], args['-o'])
+        # # 引数チェック
+        # args = parse_args(argv)
+        # # 入力データに基づき変換処理を呼び出す
+        # write_data(args['-i'], args['-f'], args['-o'])
 
         #テスト用
         # ifile = r"C:\kitazawa\dev\python_training\QT_02\sample.in"
         # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
         # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
-        # ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
-        # ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
-        # ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
-        # write_data(ifile, ffile, ofile)
+        ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
+        ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
+        ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
+        write_data(ifile, ffile, ofile)
 
     except (ArgsError, MemoryError, OSError) as exc:
         print(exc, file=sys.stderr)

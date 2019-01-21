@@ -12,7 +12,6 @@ def check_date(inyear, inmonth, inday):
     except ValueError:
         return False
 
-
 def convert_wareki(inyear, inmonth, inday):
     """引数の西暦年、月、日から元号、和暦年を返す"""
     tmp = (inyear * 10000) + (inmonth * 100) + inday
@@ -52,27 +51,58 @@ def convert_seireki(wareki, wayear):
 
 def init_func(param):
     """ paramは各関数に渡す引数。ここで初期処理を行う """
-    if param == "":
+    if param is None:
         raise SyntaxError("引数がありません")
 
-    return param
+#     if param == '':
+# #        raise SyntaxError("引数がありません シングル")
+
+#     if param == "":
+# #        raise SyntaxError("引数がありません　ダブル")
+
+    # 文字列をカンマで分割する
+    # 2個目以降を,で結合する
+    tmp = param.split(',')
+    tmpnum = len(tmp)
+    func_data = tmp[0]
+    if tmpnum > 1:
+        for hoge in tmp[1:tmpnum]:
+            func_data = func_data.rstrip('\\')
+            func_data += "," + hoge
+
+    return func_data
 
 
 def main_func(func_data, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
 
-#    print(__name__, "(B) ：", data)
+    # dataの前提
+    # 西暦日付
+    # 和暦日付
+    # 西暦日付＋時刻
+    # 和暦日付＋時刻
+
     valymd = [0, 0, 0]
     valhms = [0, 0, 0]
     wayear = 0
     wareki = ""
 
-    ptnymds = re.compile(r'([0-9]+)[/-]([0-9]+)[/-]([0-9]+)')
-    ptnymdw = re.compile(r'(明治|大正|昭和|平成)([0-9]+)年([0-9]+)月([0-9]+)日')
-    ptnhms = re.compile(r'([0-9]+):([0-9]+):([0-9]+)')
+    timeinput = False
+    tmp = data.split()
+    if len(tmp) > 2:
+        raise ValueError("スペースが分散して複数ある")
+    elif len(tmp) == 2:
+        timeinput = True
+
+    # 日付の処理
+    ptnymds = re.compile(r'([0-9]{4})[/-]([0-9]{1,2})[/-]([0-9]{1,2})')
+    ptnymdw = re.compile(r'(明治|大正|昭和|平成)([0-9]{1,2})年([0-9]{1,2})月([0-9]{1,2})日')
     ymds = ptnymds.findall(data)
     ymdw = ptnymdw.findall(data)
-    hms = ptnhms.findall(data)
+
+    # 西暦日付も和暦日付もマッチしなければエラー
+    if ymds == [] and ymdw == []:
+        raise ValueError("有効な日付が入力されていません")
 
     # 年月日の取得
     if ymds != []:
@@ -94,18 +124,28 @@ def main_func(func_data, data):
         # 西暦を取得
         valymd[0] = convert_seireki(wareki, wayear)
 
-    # 年月日の入力がある場合
-    if ymds != [] or ymdw != []:
-        # 西暦1900年未満は対象外
-        if valymd[0] < 1900:
-            raise ValueError("システムの対象範囲外の年が入力されています")
-
-        # 西暦年月日が有効か確認
-        if not check_date(valymd[0], valymd[1], valymd[2]):
+        # 和暦の年月日が有効か確認(西暦から算出した元号と入力された元号を比較)
+        tmp = convert_wareki(valymd[0], valymd[1], valymd[2])
+        if tmp[0] != wareki:
             raise ValueError("無効な日付が入力されています")
 
-    #　時刻の取得
-    if hms != []:
+    # 西暦1900年未満は対象外
+    if valymd[0] < 1900:
+        raise ValueError("システムの対象範囲外の年が入力されています")
+
+    # 西暦年月日が有効か確認
+    if not check_date(valymd[0], valymd[1], valymd[2]):
+        raise ValueError("無効な日付が入力されています")
+
+
+    # 時刻の処理
+    if timeinput:
+        ptnhms = re.compile(r'([0-9]{2}):([0-9]{2}):([0-9]{2})')
+        hms = ptnhms.findall(data)
+
+        #　時刻の取得
+        if hms == []:
+            raise ValueError("不正な時刻")
         valhms[0] = int(hms[0][0])
         valhms[1] = int(hms[0][1])
         valhms[2] = int(hms[0][2])
@@ -117,6 +157,7 @@ def main_func(func_data, data):
             raise ValueError("無効な時刻(分)が入力されています")
         if valhms[2] < 0 or valhms[2] >= 60:
             raise ValueError("無効な時刻(秒)が入力されています")
+
 
     # func_dataで指定された書式に変換
     outdata = func_data
@@ -130,8 +171,6 @@ def main_func(func_data, data):
     outdata = re.sub('HH', str(valhms[0]).zfill(2), outdata)
     outdata = re.sub('MI', str(valhms[1]).zfill(2), outdata)
     outdata = re.sub('SS', str(valhms[2]).zfill(2), outdata)
-
-#    print(__name__, "(A) ：", outdata)
 
     return outdata
 

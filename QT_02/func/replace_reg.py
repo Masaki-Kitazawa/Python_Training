@@ -4,6 +4,9 @@ import re
 def init_func(param):
     """ paramは各関数に渡す引数。ここで初期処理を行う """
 
+    if param is None:
+        raise SyntaxError("引数がありません")
+
     # 文字列をカンマで分割する
     # 1個目は正規表現、2個目以降は置換する正規表現
     # 2個目以降を,で結合する
@@ -29,9 +32,7 @@ def init_func(param):
 def main_func(func_data, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
 
-#    print(__name__, "(B) ：", data)
     data = re.sub(func_data[0], func_data[1], data)
-#    print(__name__, "(A) ：", data)
 
     # このデータが変換後のデータとして出力される(もしくは次の変換の入力データになる)
     return data
