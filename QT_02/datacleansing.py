@@ -1,4 +1,4 @@
-"""sample"""
+"""データクレンジング簡易ツールのベース部分"""
 import csv
 import os
 import sys
@@ -34,7 +34,7 @@ def parse_args(argv):
 
 
 def read_conf(conffname):
-    """クレンジング設定ファイルを読む"""
+    """クレンジング設定ファイルを読み、リストにして返す（リスト　1:項目番号、2:プラグインへの引数、3:モジュール）"""
     with open(conffname, 'rt', encoding='utf-8') as inf:
         csvrd = csv.reader(inf)
         data = []
@@ -42,20 +42,23 @@ def read_conf(conffname):
         for row in csvrd:
             rownum = len(row)
 
-            if rownum == 2:
-                col = row[0]
-                funcname = row[1]
-                data.append([col, funcname, None])
-            elif rownum == 3:
-                col = row[0]
-                funcname = row[1]
-                if row[2] == '':
-                    param = None
-                else:
-                    param = row[2]
-                data.append([col, funcname, param])
-            else:
+            # クレンジング設定ファイルは、2項目or③項目のはず
+            if rownum not in (2, 3):
                 raise SyntaxError("クレンジング設定ファイルの記載が不正です")
+
+            col = row[0]
+            funcname = row[1]
+            # ,があって、何等か文字列がある場合は引数
+            if rownum == 3 and row[2] != '':
+                param = row[2]
+            # ,がない、空文字の場合はプラグインへの引数無し
+            else:
+                param = None
+
+            # プラグインを読み込む
+            plugmod = importlib.import_module("func."+funcname)
+            # プラグインのinit_funcが正常終了時は、クレンジング設定のリストに追加
+            data.append([col, plugmod.init_func(param), plugmod])
 
     return data
 
@@ -76,15 +79,13 @@ def cleansing_data(infname, conffname):
     lineno = 0
     for data in read_data(infname):
         lineno += 1
-        for col, funcname, parm in conflist:
+#        for col, funcname, param, plugmod in conflist:
+        for col, param, plugmod in conflist:
             colno = int(col)
 
-            # 恰好悪いけど毎回ロードする
-            plugmod = importlib.import_module("func."+funcname)
-
             try:
-                ret = plugmod.init_func(parm)
-                data[colno-1] = plugmod.main_func(ret, data[colno-1])
+                # プラグインのmain_funcを呼ぶ
+                data[colno-1] = plugmod.main_func(param, data[colno-1])
             except (ValueError, SyntaxError) as exc:
                 print("例外が発生しました。行数(", lineno, ")　項目番号(", colno, ")")
                 print("理由:", exc)
@@ -116,8 +117,8 @@ def main(argv):
         # ifile = r"C:\kitazawa\dev\python_training\QT_02\sample.in"
         # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
         # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
-        # ifile = r"D:\kitaz\Python_Training\QT_02\sample1.in"
-        # ffile = r"D:\kitaz\Python_Training\QT_02\sample1.conf"
+        # ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
+        # ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
         # ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
         # write_data(ifile, ffile, ofile)
 
