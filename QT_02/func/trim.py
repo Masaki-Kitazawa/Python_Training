@@ -9,15 +9,12 @@ def init_func(param):
 
     return func_data
 
-def main_func(func_data, data):
+#def main_func(func_data, data):
+def main_func(_, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
-
-    if func_data is not None:
-        raise SyntaxError("不要な引数があります")   # Pylint 10点のために追加したが...
 
     data = data.strip()
 
-    # このデータが変換後のデータとして出力される(もしくは次の変換の入力データになる)
     return data
 
 def main():

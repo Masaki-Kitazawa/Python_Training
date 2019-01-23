@@ -73,9 +73,10 @@ def get_date(data):
         valymd[2] = int(ymds[0][2])
 
         # 和暦を取得
-        tmp = convert_wareki(valymd[0], valymd[1], valymd[2])
-        wareki = tmp[0]
-        wayear = tmp[1]
+        wareki, wayear = convert_wareki(valymd[0], valymd[1], valymd[2])
+#        tmp = convert_wareki(valymd[0], valymd[1], valymd[2])
+#        wareki = tmp[0]
+#        wayear = tmp[1]
 
     if ymdw != []:
         wareki = ymdw[0][0]
@@ -126,7 +127,8 @@ def get_time(data):
     if valhms[2] < 0 or valhms[2] >= 60:
         raise ValueError("無効な時刻(秒)が入力されています")
 
-    return valhms[0], valhms[1], valhms[2]
+#    return valhms[0], valhms[1], valhms[2]
+    return valhms
 
 
 def init_func(param):

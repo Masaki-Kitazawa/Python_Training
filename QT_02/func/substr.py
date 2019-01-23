@@ -18,20 +18,32 @@ def init_func(param):
     if paramnum != 2:
         raise SyntaxError("引数に過不足があります")
 
-    func_data = (int(plist[0][0]), int(plist[0][1]))
+    startpos = int(plist[0][0])
+    cutlen = int(plist[0][1])
+
+    # 開始位置が０以下、切り出す長さが負
+    if startpos < 1 or cutlen < 0:
+        raise SyntaxError("引数の値が不正です")
+
+    # main_funcで演算せずに使えるよう以下の形で返す
+    # 切り出し開始位置(添え字),切り出し終了位置(添え字)
+    cutlen = startpos + cutlen -1
+    startpos -= 1
+
+    func_data = (startpos, cutlen)
     return func_data
 
 def main_func(num, data):
     """ dataは処理対象とする入力データ。func_dataはinit_funcの戻り値 ここで実際の変換処理を行う"""
 
-    # dataの長さと、切り出す開始位置、長さが許容範囲か確認
+    # dataの長さと、切り出す開始位置、終了位置を確認
     datalen = len(data)
-    if num[0] < 0 or num[0] > datalen:
-        raise ValueError("データ長または切り出し開始位置が不正です")
-    if (num[0]+num[1]-1) > datalen:
-        raise ValueError("データ長または切り出し長さが不正です")
+    if num[0] + 1 > datalen:
+        raise ValueError("切り出し開始位置がデータ長に対して不正です")
+    if num[1] + 1 > datalen:
+        raise ValueError("切り出し終了位置がデータ長に対して不正です")
 
-    data = data[(num[0]-1):(num[0]+num[1]-1)]
+    data = data[num[0]:num[1]]
 
     return data
 
