@@ -2,35 +2,35 @@
 import re
 import datetime
 
-def check_date(inyear, inmonth, inday):
+def check_date(year, month, day):
     """西暦年、月、日の組み合わせの正当性をチェックする"""
     try:
-        checkdatestr = "%04d/%02d/%02d"%(inyear, inmonth, inday)
+        checkdatestr = "%04d/%02d/%02d"%(year, month, day)
 #        resultdatestr = datetime.datetime.strptime(checkdatestr, "%Y/%m/%d")
         datetime.datetime.strptime(checkdatestr, "%Y/%m/%d")
         return True
     except ValueError:
         return False
 
-def convert_wareki(inyear, inmonth, inday):
+def convert_wareki(year, month, day):
     """引数の西暦年、月、日から元号、和暦年を返す"""
-    tmp = (inyear * 10000) + (inmonth * 100) + inday
+    tmp = (year * 10000) + (month * 100) + day
     if tmp >= 19890108:
         wareki = "平成"
-        wyear = inyear - 1989 +1
+        wayear = year - 1989 +1
     elif tmp >= 19261225:
         wareki = "昭和"
-        wyear = inyear - 1926 +1
+        wayear = year - 1926 +1
     elif tmp >= 19120730:
         wareki = "大正"
-        wyear = inyear - 1912 +1
+        wayear = year - 1912 +1
     elif tmp >= 18680908:
         wareki = "明治"
-        wyear = inyear - 1868 +1
+        wayear = year - 1868 +1
     else:
         raise ValueError("システム対象外の日付が入力されています")
 
-    return wareki, wyear
+    return wareki, wayear
 
 
 def convert_seireki(wareki, wayear):
@@ -51,10 +51,12 @@ def convert_seireki(wareki, wayear):
 
 def get_date(data):
     """日付の取得"""
-    valymd = [0, 0, 0]
+
+    year = 0
+    month = 0
+    day = 0
     wayear = 0
     wareki = ""
-
 
     # 日付の処理
     ptnymds = re.compile(r'([0-9]{4})[/-]([0-9]{1,2})[/-]([0-9]{1,2})')
@@ -68,45 +70,47 @@ def get_date(data):
 
     # 年月日の取得
     if ymds != []:
-        valymd[0] = int(ymds[0][0])
-        valymd[1] = int(ymds[0][1])
-        valymd[2] = int(ymds[0][2])
+        year = int(ymds[0][0])
+        month = int(ymds[0][1])
+        day = int(ymds[0][2])
 
         # 和暦を取得
-        wareki, wayear = convert_wareki(valymd[0], valymd[1], valymd[2])
-#        tmp = convert_wareki(valymd[0], valymd[1], valymd[2])
+        wareki, wayear = convert_wareki(year, month, day)
+#        tmp = convert_wareki(year, month, day)
 #        wareki = tmp[0]
 #        wayear = tmp[1]
 
     if ymdw != []:
         wareki = ymdw[0][0]
         wayear = int(ymdw[0][1])
-        valymd[1] = int(ymdw[0][2])
-        valymd[2] = int(ymdw[0][3])
+        month = int(ymdw[0][2])
+        day = int(ymdw[0][3])
 
         # 西暦を取得
-        valymd[0] = convert_seireki(wareki, wayear)
+        year = convert_seireki(wareki, wayear)
 
         # 和暦の年月日が有効か確認(西暦から算出した元号と入力された元号を比較)
-        tmp = convert_wareki(valymd[0], valymd[1], valymd[2])
+        tmp = convert_wareki(year, month, day)
         if tmp[0] != wareki:
             raise ValueError("無効な日付が入力されています")
 
     # 西暦1900年未満は対象外
-    if valymd[0] < 1900:
+    if year < 1900:
         raise ValueError("システムの対象範囲外の年が入力されています")
 
     # 西暦年月日が有効か確認
-    if not check_date(valymd[0], valymd[1], valymd[2]):
+    if not check_date(year, month, day):
         raise ValueError("無効な日付が入力されています")
 
-    return valymd[0], valymd[1], valymd[2], wareki, wayear
+    return year, month, day, wareki, wayear
 
 
 def get_time(data):
     """時刻の取得"""
 
-    valhms = [0, 0, 0]
+    hour = 0
+    minute = 0
+    second = 0
 
     # 時刻の処理
     ptnhms = re.compile(r'([0-9]{2}):([0-9]{2}):([0-9]{2})')
@@ -115,20 +119,19 @@ def get_time(data):
     #　時刻の取得
     if hms == []:
         raise ValueError("不正な時刻")
-    valhms[0] = int(hms[0][0])
-    valhms[1] = int(hms[0][1])
-    valhms[2] = int(hms[0][2])
+    hour = int(hms[0][0])
+    minute = int(hms[0][1])
+    second = int(hms[0][2])
 
     # 時刻が有効か確認
-    if valhms[0] < 0 or valhms[0] >= 24:
+    if hour < 0 or hour >= 24:
         raise ValueError("無効な時刻(時)が入力されています")
-    if valhms[1] < 0 or valhms[1] >= 60:
+    if minute < 0 or minute >= 60:
         raise ValueError("無効な時刻(分)が入力されています")
-    if valhms[2] < 0 or valhms[2] >= 60:
+    if second < 0 or second >= 60:
         raise ValueError("無効な時刻(秒)が入力されています")
 
-#    return valhms[0], valhms[1], valhms[2]
-    return valhms
+    return hour, minute, second
 
 
 def init_func(param):
@@ -144,16 +147,18 @@ def init_func(param):
 
     # 文字列をカンマで分割する
     # 2個目以降を,で結合する
-    tmp = param.split(',')
-    tmpnum = len(tmp)
-    func_data = tmp[0]
-    if tmpnum > 1:
-        for hoge in tmp[1:tmpnum]:
-            func_data = func_data.rstrip('\\')
-            func_data += "," + hoge
+    # tmp = param.split(',')
+    # tmpnum = len(tmp)
+    # func_data = tmp[0]
+    # if tmpnum > 1:
+    #     for hoge in tmp[1:tmpnum]:
+    #         func_data = func_data.rstrip('\\')
+    #         func_data += "," + hoge
+
+    # エスケープされた,があった場合、\\を除去する
+    func_data = ','.join((hoge.rstrip('\\') for hoge in param.split(',')))
 
     return func_data
-
 
 
 def main_func(func_data, data):
