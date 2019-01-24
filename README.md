@@ -9,3 +9,8 @@ SB Creative社「やさしいPython」を写経したり、適当に弄ってみ
 - myclass ：クラス
 - Sample4 ：json read/write
 - Dummy.json ：test data
+
+
+### QT_02フォルダ
+
+ - 某研修プログラム
