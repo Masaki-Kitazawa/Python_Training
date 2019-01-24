@@ -49,7 +49,7 @@ def convert_seireki(wareki, wayear):
     return year
 
 
-def get_date(data):
+def get_date(data, ptnymds, ptnymdw):
     """日付の取得"""
 
     year = 0
@@ -59,8 +59,6 @@ def get_date(data):
     wareki = ""
 
     # 日付の処理
-    ptnymds = re.compile(r'([0-9]{4})[/-]([0-9]{1,2})[/-]([0-9]{1,2})')
-    ptnymdw = re.compile(r'(明治|大正|昭和|平成)([0-9]{1,2})年([0-9]{1,2})月([0-9]{1,2})日')
     ymds = ptnymds.findall(data)
     ymdw = ptnymdw.findall(data)
 
@@ -68,23 +66,17 @@ def get_date(data):
     if ymds == [] and ymdw == []:
         raise ValueError("有効な日付が入力されていません")
 
-    # 年月日の取得
+    # 年月日の取得(元が西暦)
     if ymds != []:
-        year = int(ymds[0][0])
-        month = int(ymds[0][1])
-        day = int(ymds[0][2])
+        year, month, day = (int(v) for v in ymds[0])
 
         # 和暦を取得
         wareki, wayear = convert_wareki(year, month, day)
-#        tmp = convert_wareki(year, month, day)
-#        wareki = tmp[0]
-#        wayear = tmp[1]
 
+    # 年月日の取得(元が和暦)
     if ymdw != []:
         wareki = ymdw[0][0]
-        wayear = int(ymdw[0][1])
-        month = int(ymdw[0][2])
-        day = int(ymdw[0][3])
+        wayear, month, day = (int(v) for v in ymdw[0][1:])
 
         # 西暦を取得
         year = convert_seireki(wareki, wayear)
@@ -105,7 +97,7 @@ def get_date(data):
     return year, month, day, wareki, wayear
 
 
-def get_time(data):
+def get_time(data, ptnhms):
     """時刻の取得"""
 
     hour = 0
@@ -113,15 +105,12 @@ def get_time(data):
     second = 0
 
     # 時刻の処理
-    ptnhms = re.compile(r'([0-9]{2}):([0-9]{2}):([0-9]{2})')
     hms = ptnhms.findall(data)
 
     #　時刻の取得
     if hms == []:
         raise ValueError("不正な時刻")
-    hour = int(hms[0][0])
-    minute = int(hms[0][1])
-    second = int(hms[0][2])
+    hour, minute, second = (int(v) for v in hms[0])
 
     # 時刻が有効か確認
     if hour < 0 or hour >= 24:
@@ -138,6 +127,11 @@ def init_func(param):
     """ paramは各関数に渡す引数。ここで初期処理を行う """
     if param is None:
         raise SyntaxError("引数がありません")
+
+    # 抽出用の正規表現をinit_funcで用意しておく
+    ptnymds = re.compile(r'([0-9]{4})[/-]([0-9]{1,2})[/-]([0-9]{1,2})')
+    ptnymdw = re.compile(r'(明治|大正|昭和|平成)([0-9]{1,2})年([0-9]{1,2})月([0-9]{1,2})日')
+    ptnhms = re.compile(r'([0-9]{2}):([0-9]{2}):([0-9]{2})')
 
 #     if param == '':
 # #        raise SyntaxError("引数がありません シングル")
@@ -156,7 +150,9 @@ def init_func(param):
     #         func_data += "," + hoge
 
     # エスケープされた,があった場合、\\を除去する
-    func_data = ','.join((hoge.rstrip('\\') for hoge in param.split(',')))
+    repstr = ','.join((tmp.rstrip('\\') for tmp in param.split(',')))
+
+    func_data = (repstr, ptnymds, ptnymdw, ptnhms)
 
     return func_data
 
@@ -181,16 +177,16 @@ def main_func(func_data, data):
         raise ValueError("スペースが分散して複数ある")
 
     # 日付の処理
-    valymd = get_date(inputdata[0])
+    valymd = get_date(inputdata[0], func_data[1], func_data[2])
 
     # 時刻の処理
     if timeinput:
-        valhms = get_time(inputdata[1])
+        valhms = get_time(inputdata[1], func_data[3])
     else:
         valhms = (0, 0, 0)
 
     # func_dataで指定された書式に変換
-    outdata = func_data
+    outdata = func_data[0]
     outdata = re.sub('YYYY', str(valymd[0]), outdata)
     outdata = re.sub('EE', str(valymd[3]), outdata)
     outdata = re.sub('YY', str(valymd[4]), outdata)
