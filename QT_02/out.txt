@@ -1,3 +1,0 @@
-replace,replace,format
-replace,replace,format
-replace,replace,format
