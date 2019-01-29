@@ -10,6 +10,9 @@ def init_func(param):
     # 文字列をカンマで分割する
     # 1個目は正規表現、2個目以降は置換する正規表現
     # 2個目以降を,で結合する
+
+    # 正規表現 r'(?<!\\),'を使えばシンプルにできる
+
     tmp = param.split(',')
     if len(tmp) < 2:
         raise SyntaxError("引数が足りません")

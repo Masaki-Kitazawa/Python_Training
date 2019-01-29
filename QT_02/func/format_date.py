@@ -186,6 +186,7 @@ def main_func(func_data, data):
         valhms = (0, 0, 0)
 
     # func_dataで指定された書式に変換
+    # replaceを使った方が早いかも
     outdata = func_data[0]
     outdata = re.sub('YYYY', str(valymd[0]), outdata)
     outdata = re.sub('EE', str(valymd[3]), outdata)
