@@ -3,6 +3,7 @@ import csv
 import os
 import sys
 import importlib
+import pandas as pd
 
 class ArgsError(Exception):
     """arguments exception（パクリ）"""
@@ -37,34 +38,45 @@ def parse_args(argv):
 
 def main(argv):
     """main（引数チェックはパクリ）"""
-    result = 1
 
-    try:
-        # 本番用
-        # 引数チェック
-        args = parse_args(argv)
-        # 入力データに基づき変換処理を呼び出す
-        write_data(args['-i'], args['-f'], args['-o'])
 
-        #テスト用
-        # ifile = r"C:\kitazawa\dev\python_training\QT_02\sample.in"
-        # ffile = r"C:\kitazawa\dev\python_training\QT_02\sample.conf"
-        # ofile = r"C:\kitazawa\dev\python_training\QT_02\out.txt"
-        # ifile = r"D:\kitaz\Python_Training\QT_02\sample.in"
-        # ffile = r"D:\kitaz\Python_Training\QT_02\sample.conf"
-        # ofile = r"D:\kitaz\Python_Training\QT_02\out.txt"
-        # write_data(ifile, ffile, ofile)
+    url = 'http://www.urawa-reds.co.jp/game/'
+    dfs = pd.read_html(url, header=0, index_col=0)
 
-    except (ArgsError, MemoryError, OSError) as exc:
-        print(exc, file=sys.stderr)
+    # 取得テーブル数確認
+    print(len(dfs))
 
-    else:
-        result = 0
-    finally:
-        pass
+    # 取得テーブルデータ確認
+    print(dfs)
 
-    return result
+    # 結合
+    # df = pd.concat(dfs)
+
+    # 0番目のテーブルを保存（リストの番号を変更する）
+    dfs[0].to_csv('result.csv')
+
+
+
+    # try:
+    #     # 本番用
+    #     # 引数チェック
+    #     # args = parse_args(argv)
+    #     # 入力データに基づき変換処理を呼び出す
+    #     # write_data(args['-i'], args['-f'], args['-o'])
+
+
+    # except (ArgsError, MemoryError, OSError) as exc:
+    #     print(exc, file=sys.stderr)
+
+    # else:
+    #     result = 0
+    # finally:
+    #     pass
+
+    # return result
 
 if __name__ == '__main__':
 #    sys.exit(main(sys.argv))
-    (main(sys.argv))
+#    (main(sys.argv))
+    main(sys.argv)
+
