@@ -34,11 +34,8 @@ def parse_args(argv):
     return args
 
 
-
-
-def main(argv):
-    """main（引数チェックはパクリ）"""
-
+def get_gamedata():
+    """URLから試合日ｎの情報を取得する"""
 
     url = 'http://www.urawa-reds.co.jp/game/'
     dfs = pd.read_html(url, header=0, index_col=0)
@@ -48,6 +45,14 @@ def main(argv):
 
     # 取得テーブルデータ確認
     print(dfs)
+
+    return dfs
+
+
+def main(argv):
+    """main（引数チェックはパクリ）"""
+
+    dfs = get_gamedata()
 
     # 結合
     # df = pd.concat(dfs)
@@ -77,6 +82,5 @@ def main(argv):
 
 if __name__ == '__main__':
 #    sys.exit(main(sys.argv))
-#    (main(sys.argv))
     main(sys.argv)
 
