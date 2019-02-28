@@ -44,21 +44,32 @@ def get_gamedata():
     print(len(dfs))
 
     # 取得テーブルデータ確認
-    print(dfs)
+#    print(dfs)
 
     return dfs
+
+
+def cleansing_gamedata(dfs):
+    """"""
+    for data in dfs[0]:
+        print("+++", data, "---")
+
+    return 0
 
 
 def main(argv):
     """main（引数チェックはパクリ）"""
 
     dfs = get_gamedata()
+    tmp = cleansing_gamedata(dfs)
+
+
 
     # 結合
     # df = pd.concat(dfs)
 
     # 0番目のテーブルを保存（リストの番号を変更する）
-    dfs[0].to_csv('result.csv')
+    #dfs[0].to_csv('result.csv')
 
 
 
